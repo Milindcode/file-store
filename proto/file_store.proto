@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package file_store; 
+
+option go_package = "/;file_store";
+
+
+service FileTransfer{
+    rpc SendFile(stream FileData) returns (FileResponse); 
+}
+
+message FileData{
+    bytes chunk =1; 
+    string fileName = 2; 
+}
+
+message FileResponse{
+    bool success =1; 
+    string message =2; 
+}
