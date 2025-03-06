@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload via WebSocket</title>
+</head>
+<body>
+    <h2>Upload File via WebSocket</h2>
+    <input type="file" id="fileInput">
+    <button id="uploadButton" disabled>Upload</button>
+
+    <script>
+        const fileInput = document.getElementById("fileInput");
+        const uploadButton = document.getElementById("uploadButton");
+        let socket;
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length > 0) {
+                uploadButton.disabled = false;
+            }
+        });
+
+        uploadButton.addEventListener("click", () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            // Open WebSocket connection
+            socket = new WebSocket("ws://localhost:8080/file");
+
+            socket.onopen = () => {
+                console.log("WebSocket Connected!");
+                sendFileInChunks(file);
+            };
+
+            socket.onerror = (error) => console.error("WebSocket Error:", error);
+            socket.onclose = () => console.log("WebSocket Closed");
+
+            socket.onmessage = (event) => {
+                try {
+                    let response = JSON.parse(event.data);
+                    console.log("Server Response:", response);
+                } catch (err) {
+                    console.error("Error parsing response:", err);
+                }
+            };
+        });
+
+        function sendFileInChunks(file) {
+            const chunkSize = 1024 * 1024*5; // 5 MB chunks
+            let offset = 0;
+
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                if (event.target.result && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        chunk: Array.from(new Uint8Array(event.target.result)),
+                        filename: file.name,
+                        eof: false
+                    }));
+                    offset += chunkSize;
+                    if (offset < file.size) {
+                        readNextChunk();
+                    } else {
+                        socket.send(JSON.stringify({ eof: true, filename: file.name }));
+                        console.log("File sent completely!");
+                    }
+                }
+            };
+
+            function readNextChunk() {
+                const chunk = file.slice(offset, offset + chunkSize);
+                reader.readAsArrayBuffer(chunk);
+            }
+
+            readNextChunk();
+        }
+    </script>
+</body>
+</html>
