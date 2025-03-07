@@ -47,7 +47,7 @@
         });
 
         function sendFileInChunks(file) {
-            const chunkSize = 1024 * 1024*5; // 5 MB chunks
+            const chunkSize = 1024 * 1024; // 5 MB chunks
             let offset = 0;
 
             const reader = new FileReader();

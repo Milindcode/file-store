@@ -10,8 +10,9 @@ service FileTransfer{
 }
 
 message FileData{
-    bytes chunk =1; 
-    string fileName = 2; 
+    bool eof=1; 
+    bytes chunk =2; 
+    string fileName = 3; 
 }
 
 message FileResponse{

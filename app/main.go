@@ -4,14 +4,13 @@ import (
 	"log"
 	"net/http"
 
-	routes "github.com/Milindcode/file_store/server/router"
+	routes "github.com/Milindcode/file_store/app/router"
 )
 
 func main() {
 	router := http.NewServeMux()
 
 	router.HandleFunc("/file", routes.FileChunkHandler())
-
 
 	log.Println("Starting the server at port 8080")
 	err := http.ListenAndServe(":8080", router)
