@@ -1,0 +1,36 @@
+networks:
+  file-store-network:
+    driver: bridge
+
+services:  
+    grpc: 
+      build:
+        context: ./grpc
+      container_name: grpc
+      restart: always
+      ports: 
+        - "50051:50051"
+      networks:
+        - file-store-network
+      deploy: 
+        mode: replicated
+        replicas: 1
+      volumes:
+        - file-data:/var/lib/files/data
+    app: 
+      build:
+        context: ./app
+      container_name: file_store_app
+      restart: always
+      ports: 
+        - "8080:8080"
+      networks:
+        - file-store-network
+      deploy: 
+        mode: replicated
+        replicas: 1
+      depends_on: 
+        - grpc
+    
+volumes: 
+  file-data: {}

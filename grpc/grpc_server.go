@@ -42,7 +42,7 @@ func (server *FileServer) SendFile(stream file_store.FileTransfer_SendFileServer
 		}
 
 		if file == nil {
-			file, err = os.Create(data.FileName)
+			file, err = os.Create("/var/lib/files/data" + data.FileName)
 			if err != nil{
 				stream.SendAndClose(&file_store.FileResponse{
 					Success: false,

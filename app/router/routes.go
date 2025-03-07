@@ -28,7 +28,7 @@ func FileChunkHandler() http.HandlerFunc {
 		// var file *os.File
 		// var fileName string
 
-		grpc_conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+		grpc_conn, err := grpc.NewClient("grpc:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			log.Fatalf("Error connecting to grpc server: %v", err)
 		}
